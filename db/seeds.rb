@@ -191,6 +191,30 @@ listing_5 = Listing.create!(
   status: :draft
 )
 
+listing_6 = Listing.create!(
+  property: property_1,
+  monthly_rent: 400_000,
+  deposit: 400_000,
+  availability_date: Date.current,
+  minimum_stay: 6,
+  furnished: true,
+  private_bathroom: false,
+  description: "Room that has already been rented.",
+  status: :rented
+)
+
+listing_7 = Listing.create!(
+  property: property_4,
+  monthly_rent: 320_000,
+  deposit: 320_000,
+  availability_date: Date.current + 25.days,
+  minimum_stay: 3,
+  furnished: true,
+  private_bathroom: false,
+  description: "Listing withdrawn by the host.",
+  status: :withdrawn
+)
+
 puts "Creating applications..."
 
 application_pending = Application.create!(

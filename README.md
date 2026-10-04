@@ -70,7 +70,7 @@ Visits can have the following states:
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/AndresBerriosL/webtech-roomies.git
 cd webtech-roomies
 ```
 
