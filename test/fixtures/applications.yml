@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  listing: one
+  seeker_id:
+  message: MyText
+  move_in_date: 2026-10-04
+  intended_stay: 1
+  status: 1
+
+two:
+  listing: two
+  seeker_id:
+  message: MyText
+  move_in_date: 2026-10-04
+  intended_stay: 1
+  status: 1

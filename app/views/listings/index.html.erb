@@ -1,0 +1,28 @@
+<div class="col">
+  <div class="card h-100 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">
+        <%= listing.property.neighborhood.name %>
+      </h5>
+
+      <p class="card-text mb-1">
+        <strong>Rent:</strong>
+        <%= number_to_currency(listing.monthly_rent, unit: "$", precision: 0) %>
+      </p>
+
+      <p class="card-text mb-1">
+        <strong>Available:</strong>
+        <%= listing.availability_date.strftime("%d/%m/%Y") %>
+      </p>
+
+      <p class="card-text">
+        <strong>Property:</strong>
+        <%= listing.property.address %>
+      </p>
+
+      <%= link_to "View room",
+                  listing_path(listing),
+                  class: "btn btn-primary" %>
+    </div>
+  </div>
+</div>

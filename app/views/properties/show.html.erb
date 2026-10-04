@@ -1,0 +1,81 @@
+<div class="container py-5">
+  <%= link_to "← Back to properties",
+              properties_path,
+              class: "btn btn-outline-secondary mb-4" %>
+
+  <h1><%= @property.address %></h1>
+
+  <p class="lead">
+    <%= @property.neighborhood.name %>
+  </p>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h4">Property details</h2>
+
+      <p><strong>Host:</strong> <%= @property.host.name %></p>
+      <p><strong>Type:</strong> <%= @property.property_type %></p>
+      <p><strong>Bedrooms:</strong> <%= @property.bedrooms %></p>
+      <p><strong>Bathrooms:</strong> <%= @property.bathrooms %></p>
+
+      <p>
+        <strong>Shared spaces:</strong>
+        <%= @property.shared_spaces.presence || "Not specified" %>
+      </p>
+    </div>
+  </div>
+
+  <section class="mb-5">
+    <h2>Amenities</h2>
+
+    <% if @property.amenities.any? %>
+      <div class="d-flex flex-wrap gap-2">
+        <% @property.amenities.each do |amenity| %>
+          <span class="badge text-bg-secondary">
+            <%= amenity.name %>
+          </span>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted">No amenities registered.</p>
+    <% end %>
+  </section>
+
+  <section class="mb-5">
+    <h2>Rooms in this property</h2>
+
+    <% if @property.listings.any? %>
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+        <%= render partial: "listings/listing_card",
+                   collection: @property.listings,
+                   as: :listing %>
+      </div>
+    <% else %>
+      <p class="text-muted">This property has no listings.</p>
+    <% end %>
+  </section>
+
+  <section>
+    <h2>Reviews</h2>
+
+    <% if @reviews.any? %>
+      <% @reviews.each do |review| %>
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5>
+              <%= "★" * review.rating %><%= "☆" * (5 - review.rating) %>
+            </h5>
+
+            <p><%= review.comment %></p>
+
+            <small class="text-muted">
+              <%= review.visit.application.seeker.name %>
+            </small>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-muted">This property has no reviews yet.</p>
+    <% end %>
+  </section>
+</div>

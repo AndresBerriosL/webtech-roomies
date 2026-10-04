@@ -1,0 +1,12 @@
+# Local/runtime files
+/node_modules/
+/log/
+/tmp/
+/storage/
+/vendor/bundle/
+
+# Local secrets
+/.env
+/.env.*
+/config/master.key
+/.kamal/secrets

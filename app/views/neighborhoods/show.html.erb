@@ -1,0 +1,52 @@
+<div class="container py-5">
+  <%= link_to "← Back to neighborhoods",
+              neighborhoods_path,
+              class: "btn btn-outline-secondary mb-4" %>
+
+  <h1><%= @neighborhood.name %></h1>
+
+  <p class="lead">
+    Properties and rooms available in this neighborhood.
+  </p>
+
+  <h2 class="mt-5">Properties</h2>
+
+  <% if @properties.any? %>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      <% @properties.each do |property| %>
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">
+                <%= property.address %>
+              </h5>
+
+              <p>
+                <strong>Type:</strong>
+                <%= property.property_type %>
+              </p>
+
+              <p>
+                <strong>Bedrooms:</strong>
+                <%= property.bedrooms %>
+              </p>
+
+              <p>
+                <strong>Listings:</strong>
+                <%= property.listings.size %>
+              </p>
+
+              <%= link_to "View property",
+                          property_path(property),
+                          class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted">
+      There are no properties in this neighborhood yet.
+    </p>
+  <% end %>
+</div>

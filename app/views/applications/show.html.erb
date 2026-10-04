@@ -1,0 +1,102 @@
+<div class="container py-5">
+  <%= link_to "← Back to applications",
+              applications_path,
+              class: "btn btn-outline-secondary mb-4" %>
+
+  <h1>Application</h1>
+
+  <div class="row g-4 mt-2">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h4">Application details</h2>
+
+          <p>
+            <strong>Seeker:</strong>
+            <%= @application.seeker.name %>
+          </p>
+
+          <p>
+            <strong>Status:</strong>
+            <span class="badge text-bg-secondary">
+              <%= @application.status.humanize %>
+            </span>
+          </p>
+
+          <p>
+            <strong>Move-in date:</strong>
+            <%= @application.move_in_date.strftime("%d/%m/%Y") %>
+          </p>
+
+          <p>
+            <strong>Intended stay:</strong>
+            <%= @application.intended_stay %> months
+          </p>
+
+          <p>
+            <strong>Message:</strong>
+          </p>
+
+          <p><%= @application.message %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h4">Listing</h2>
+
+          <p>
+            <strong>Neighborhood:</strong>
+            <%= @application.listing.property.neighborhood.name %>
+          </p>
+
+          <p>
+            <strong>Address:</strong>
+            <%= @application.listing.property.address %>
+          </p>
+
+          <p>
+            <strong>Monthly rent:</strong>
+            <%= number_to_currency(
+                  @application.listing.monthly_rent,
+                  unit: "$",
+                  precision: 0
+                ) %>
+          </p>
+
+          <%= link_to "View listing",
+                      listing_path(@application.listing),
+                      class: "btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="mt-5">
+    <h2>Visits</h2>
+
+    <% if @application.visits.any? %>
+      <% @application.visits.each do |visit| %>
+        <div class="card mb-3">
+          <div class="card-body">
+            <p class="mb-1">
+              <strong>Date:</strong>
+              <%= visit.scheduled_at.strftime("%d/%m/%Y %H:%M") %>
+            </p>
+
+            <p class="mb-0">
+              <strong>Status:</strong>
+              <%= visit.status.humanize %>
+            </p>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-muted">
+        No visits have been scheduled for this application.
+      </p>
+    <% end %>
+  </section>
+</div>
