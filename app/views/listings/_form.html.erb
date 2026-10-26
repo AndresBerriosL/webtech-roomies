@@ -66,14 +66,19 @@
 
   <div class="mb-4">
     <%= form.label :description, class: "form-label" %>
-    <%= form.text_area :description,
+    <%= form.rich_text_area :description,
           class: "form-control",
-          rows: 4,
           required: true,
           placeholder: "Describe the room..." %>
   </div>
 
-  
+  <div class="mb-4">
+    <%= form.label :house_rules, "House rules", class: "form-label" %>
+    <%= form.rich_text_area :house_rules,
+            class: "form-control",
+            placeholder: "Describe the house rules..." %>
+    </div>
+
     <div class="mb-4">
     <%= form.label :photos, "Room photographs", class: "form-label" %>
 

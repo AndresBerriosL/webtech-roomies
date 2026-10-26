@@ -60,14 +60,29 @@
 
   <div class="row g-4">
     <div class="col-lg-8">
-      <h1>Room in <%= @listing.property.neighborhood.name %></h1>
-
-      <p class="lead">
-        <%= @listing.description %>
-      </p>
-
       
-      <% if @listing.photos.attached? %>
+<h1>Room in <%= @listing.property.neighborhood.name %></h1>
+
+  <section class="my-4">
+    <h2 class="h4">Description</h2>
+
+    <div class="lead">
+      <%= @listing.description %>
+    </div>
+  </section>
+
+  <% if @listing.house_rules.present? %>
+    <section class="my-4">
+      <h2 class="h4">House rules</h2>
+
+      <div>
+        <%= @listing.house_rules %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @listing.photos.attached? %>
+
         <section class="my-4">
           <h2 class="h4 mb-3">Room photographs</h2>
 

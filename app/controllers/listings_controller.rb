@@ -1,9 +1,7 @@
 
 class ListingsController < ApplicationController
-  before_action :set_listing, only: %i[show edit update destroy publish]
-  before_action :set_property, only: %i[new create]
-  before_action :require_owner, only: %i[edit update destroy publish]
   before_action :set_listing, only: %i[show edit update destroy publish withdraw]
+  before_action :set_property, only: %i[new create]
   before_action :require_owner, only: %i[edit update destroy publish withdraw]
 
   def index
@@ -134,6 +132,7 @@ class ListingsController < ApplicationController
                 alert: "You can only modify your own listings."
   end
 
+  
   def listing_params
     params.require(:listing).permit(
       :monthly_rent,
@@ -143,7 +142,9 @@ class ListingsController < ApplicationController
       :furnished,
       :private_bathroom,
       :description,
+      :house_rules,
       photos: []
     )
   end
+
 end

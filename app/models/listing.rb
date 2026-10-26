@@ -1,6 +1,8 @@
 class Listing < ApplicationRecord
   belongs_to :property
   has_many_attached :photos
+  has_rich_text :description
+  has_rich_text :house_rules
 
   enum :status, {
     draft: 0,
@@ -23,6 +25,7 @@ class Listing < ApplicationRecord
   validates :description, presence: true
 
   validate :availability_date_cannot_be_in_the_past
+  validate :validate_photos
 
   has_many :applications, dependent: :destroy
   has_many :saved_listings, dependent: :destroy
@@ -50,4 +53,18 @@ class Listing < ApplicationRecord
       errors.add(:availability_date, "cannot be in the past")
     end
   end
+
+  
+  def validate_photos
+    photos.each do |photo|
+      unless photo.blob.content_type.in?(%w[image/jpeg image/png image/webp])
+        errors.add(:photos, "must be JPG, PNG or WebP images")
+      end
+
+      if photo.blob.byte_size > 5.megabytes
+        errors.add(:photos, "must be smaller than 5 MB each")
+      end
+    end
+  end
+
 end
