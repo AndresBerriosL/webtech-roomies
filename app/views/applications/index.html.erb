@@ -17,37 +17,7 @@
 
         <tbody>
           <% @applications.each do |application| %>
-            <tr>
-              <td><%= application.seeker.name %></td>
-
-              <td>
-                <%= number_to_currency(
-                      application.listing.monthly_rent,
-                      unit: "$",
-                      precision: 0
-                    ) %>
-              </td>
-
-              <td>
-                <%= application.listing.property.neighborhood.name %>
-              </td>
-
-              <td>
-                <%= application.move_in_date.strftime("%d/%m/%Y") %>
-              </td>
-
-              <td>
-                <span class="badge text-bg-secondary">
-                  <%= application.status.humanize %>
-                </span>
-              </td>
-
-              <td>
-                <%= link_to "View",
-                            application_path(application),
-                            class: "btn btn-sm btn-outline-primary" %>
-              </td>
-            </tr>
+            <%= render "application_row", application: application %>
           <% end %>
         </tbody>
       </table>

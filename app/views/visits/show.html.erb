@@ -1,0 +1,125 @@
+
+<div class="container py-5">
+
+  <%= link_to "← Back to application",
+              application_path(@application),
+              class: "btn btn-outline-secondary mb-4" %>
+
+  <h1 class="mb-4">Visit details</h1>
+
+  <div class="row g-4">
+
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <h2 class="h4 mb-4">Scheduled visit</h2>
+
+          <p>
+            <strong>Candidate:</strong>
+            <%= @application.seeker.name %>
+          </p>
+
+          <p>
+            <strong>Host:</strong>
+            <%= @application.listing.property.host.name %>
+          </p>
+
+          <p>
+            <strong>Date and time:</strong>
+            <%= l(@visit.scheduled_at, format: :long) %>
+          </p>
+
+          <p>
+            <strong>Status:</strong>
+            <span class="badge text-bg-secondary">
+              <%= @visit.status.humanize %>
+            </span>
+          </p>
+
+          <hr>
+
+          <% if @application.listing.property.host == current_user &&
+                (@visit.proposed? || @visit.confirmed?) %>
+
+            <%= link_to "Reschedule visit",
+                        edit_visit_path(@visit),
+                        class: "btn btn-warning mb-3" %>
+
+            <% end %>
+
+          <% if @application.seeker == current_user &&
+                @visit.proposed? %>
+
+            <%= button_to "Confirm visit",
+                  confirm_visit_path(@visit),
+                  method: :patch,
+                  class: "btn btn-success mb-3" %>
+
+          <% end %>
+
+          <% if @visit.proposed? || @visit.confirmed? %>
+
+            <%= button_to "Cancel visit",
+                  cancel_visit_path(@visit),
+                  method: :patch,
+                  class: "btn btn-outline-danger mb-3",
+                  form: {
+                    data: {
+                      turbo_confirm: "Are you sure you want to cancel this visit?"
+                    }
+                  } %>
+
+          <% end %>
+
+          <% if @application.listing.property.host == current_user &&
+                @visit.confirmed? &&
+                @visit.scheduled_at <= Time.current %>
+
+            <%= button_to "Complete visit",
+                  complete_visit_path(@visit),
+                  method: :patch,
+                  class: "btn btn-primary" %>
+
+          <% end %>
+
+          <% if @visit.completed? &&
+            @application.seeker == current_user &&
+            @visit.review.nil? %>
+
+        <%= link_to "Review property",
+                new_visit_review_path(@visit),
+                class: "btn btn-success mb-3" %>
+
+        <% end %>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <h2 class="h5">Property</h2>
+
+          <p>
+            <strong>Address:</strong>
+            <%= @application.listing.property.address %>
+          </p>
+
+          <p>
+            <strong>Neighborhood:</strong>
+            <%= @application.listing.property.neighborhood.name %>
+          </p>
+
+          <%= link_to "View listing",
+                listing_path(@application.listing),
+                class: "btn btn-outline-primary" %>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

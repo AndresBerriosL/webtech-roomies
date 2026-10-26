@@ -57,6 +57,37 @@
   <%= link_to "← Back to listings",
               listings_path,
               class: "btn btn-outline-secondary mb-4" %>
+  
+  
+  
+<% if @listing.published? &&
+      @listing.property.host != current_user %>
+
+  <%= turbo_frame_tag "application_form" do %>
+    <% existing_application = @listing.applications.find_by(seeker: current_user) %>
+
+    <% if existing_application %>
+      <div class="alert alert-info my-3">
+        You have already applied to this room.
+
+        <%= link_to "View your application",
+              application_path(existing_application),
+              data: { turbo_frame: "_top" },
+              class: "alert-link" %>
+      </div>
+    <% else %>
+      <div class="mb-4">
+        <%= link_to "Apply for this room",
+              new_application_path(listing_id: @listing.id),
+              data: { turbo_frame: "application_form" },
+              class: "btn btn-success" %>
+      </div>
+    <% end %>
+  <% end %>
+
+<% end %>
+
+
 
   <div class="row g-4">
     <div class="col-lg-8">

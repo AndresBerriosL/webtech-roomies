@@ -133,18 +133,28 @@ class ListingsController < ApplicationController
   end
 
   
-  def listing_params
-    params.require(:listing).permit(
-      :monthly_rent,
-      :deposit,
-      :availability_date,
-      :minimum_stay,
-      :furnished,
-      :private_bathroom,
-      :description,
-      :house_rules,
-      photos: []
-    )
+  
+def listing_params
+  permitted = params.require(:listing).permit(
+    :monthly_rent,
+    :deposit,
+    :availability_date,
+    :minimum_stay,
+    :furnished,
+    :private_bathroom,
+    :description,
+    :house_rules,
+    photos: []
+  )
+
+  # Don't remove existing photos when editing without new uploads.
+  if permitted[:photos].present? &&
+     permitted[:photos].all?(&:blank?)
+    permitted.delete(:photos)
   end
+
+  permitted
+end
+
 
 end
