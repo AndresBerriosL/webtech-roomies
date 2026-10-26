@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   root "home#index"
 
   resources :listings, only: %i[index show]
-  resources :properties, only: %i[index show]
+  resources :properties
   resources :neighborhoods
   resources :amenities
   resources :applications, only: %i[index show]

@@ -1,0 +1,96 @@
+
+<%= form_with model: property do |form| %>
+
+  <% if property.errors.any? %>
+    <div class="alert alert-danger">
+      <h5>Please correct the following errors:</h5>
+      <ul class="mb-0">
+        <% property.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :address, class: "form-label" %>
+    <%= form.text_field :address,
+          class: "form-control",
+          placeholder: "Enter property address",
+          required: true %>
+
+    <% property.errors.full_messages_for(:address).each do |message| %>
+      <div class="text-danger small"><%= message %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :neighborhood_id, "Neighborhood", class: "form-label" %>
+    <%= form.collection_select :neighborhood_id,
+          Neighborhood.order(:name), :id, :name,
+          { prompt: "Select a neighborhood" },
+          { class: "form-select", required: true } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :property_type, "Property type", class: "form-label" %>
+    <%= form.select :property_type,
+          ["Apartment", "House", "Studio", "Other"],
+          { prompt: "Select a property type" },
+          { class: "form-select", required: true } %>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= form.label :bedrooms, class: "form-label" %>
+      <%= form.number_field :bedrooms,
+            class: "form-control",
+            min: 1,
+            required: true %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <%= form.label :bathrooms, class: "form-label" %>
+      <%= form.number_field :bathrooms,
+            class: "form-control",
+            min: 1,
+            required: true %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :shared_spaces, class: "form-label" %>
+    <%= form.text_area :shared_spaces,
+          class: "form-control",
+          rows: 3,
+          placeholder: "Kitchen, living room, garden..." %>
+  </div>
+
+  
+<fieldset class="mb-4">
+<legend class="fs-5 mb-3">Amenities</legend>
+
+<div class="row row-cols-1 row-cols-md-2 g-2">
+    <%= form.collection_check_boxes :amenity_ids,
+        Amenity.order(:name), :id, :name do |checkbox| %>
+
+    <div class="col">
+        <div class="form-check">
+        <%= checkbox.check_box class: "form-check-input" %>
+        <%= checkbox.label class: "form-check-label" %>
+        </div>
+    </div>
+
+    <% end %>
+</div>
+
+
+  <div class="d-flex gap-2">
+    <%= form.submit class: "btn btn-primary" %>
+
+    <%= link_to "Cancel",
+          properties_path,
+          class: "btn btn-outline-secondary" %>
+  </div>
+
+<% end %>

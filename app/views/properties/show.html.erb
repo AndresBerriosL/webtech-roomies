@@ -3,7 +3,29 @@
               properties_path,
               class: "btn btn-outline-secondary mb-4" %>
 
-  <h1><%= @property.address %></h1>
+  
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+    <h1 class="mb-0"><%= @property.address %></h1>
+
+    <% if @property.host == current_user %>
+      <div class="d-flex gap-2">
+        <%= link_to "Edit Property",
+                    edit_property_path(@property),
+                    class: "btn btn-warning" %>
+
+        <%= button_to "Delete Property",
+                      property_path(@property),
+                      method: :delete,
+                      form: {
+                        data: {
+                          turbo_confirm: "Are you sure you want to delete this property?"
+                        }
+                      },
+                      class: "btn btn-danger" %>
+      </div>
+    <% end %>
+  </div>
+
 
   <p class="lead">
     <%= @property.neighborhood.name %>
