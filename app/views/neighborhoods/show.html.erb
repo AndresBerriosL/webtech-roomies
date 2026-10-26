@@ -1,11 +1,30 @@
+
 <div class="container py-5">
   <%= link_to "← Back to neighborhoods",
               neighborhoods_path,
               class: "btn btn-outline-secondary mb-4" %>
 
-  <h1><%= @neighborhood.name %></h1>
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <h1 class="mb-0"><%= @neighborhood.name %></h1>
 
-  <p class="lead">
+    <div class="d-flex gap-2">
+      <%= link_to "Edit Neighborhood",
+                  edit_neighborhood_path(@neighborhood),
+                  class: "btn btn-warning" %>
+
+      <%= button_to "Delete Neighborhood",
+                    neighborhood_path(@neighborhood),
+                    method: :delete,
+                    form: {
+                      data: {
+                        turbo_confirm: "Are you sure you want to delete this neighborhood?"
+                      }
+                    },
+                    class: "btn btn-danger" %>
+    </div>
+  </div>
+
+  <p class="lead mt-3">
     Properties and rooms available in this neighborhood.
   </p>
 
