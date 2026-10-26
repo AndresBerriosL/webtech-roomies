@@ -1,6 +1,27 @@
+
 <div class="col">
   <div class="card h-100 shadow-sm">
+
+    <% if listing.photos.attached? %>
+      <%= image_tag listing.photos.first.variant(
+            resize_to_fill: [400, 250]
+          ),
+          class: "card-img-top",
+          alt: "Room photograph",
+          style: "height: 250px; object-fit: cover;" %>
+    <% else %>
+      <div class="bg-light text-secondary d-flex align-items-center justify-content-center"
+           style="height: 250px;">
+        No photograph available
+      </div>
+    <% end %>
+
     <div class="card-body">
+
+      <span class="badge text-bg-secondary mb-2">
+        <%= listing.status.humanize %>
+      </span>
+
       <h5 class="card-title">
         <%= listing.property.neighborhood.name %>
       </h5>

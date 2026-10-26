@@ -63,14 +63,32 @@
     <% end %>
   </section>
 
+  
   <section class="mb-5">
-    <h2>Rooms in this property</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="mb-0">Rooms in this property</h2>
+
+      <% if @property.host == current_user %>
+        <%= link_to "Add Listing",
+                    new_property_listing_path(@property),
+                    class: "btn btn-primary" %>
+      <% end %>
+    </div>
+
 
     <% if @property.listings.any? %>
       <div class="row row-cols-1 row-cols-md-2 g-4">
+        
+        <% visible_listings = if @property.host == current_user
+                                @property.listings
+                              else
+                                @property.listings.select(&:published?)
+                              end %>
+
         <%= render partial: "listings/listing_card",
-                   collection: @property.listings,
-                   as: :listing %>
+                  collection: visible_listings,
+                  as: :listing %>
+
       </div>
     <% else %>
       <p class="text-muted">This property has no listings.</p>

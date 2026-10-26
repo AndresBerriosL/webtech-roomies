@@ -64,4 +64,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
+gem "image_processing", "~> 2.0"
+gem "mini_magick", "~> 5.0"
+
 gem "json", "= 2.21.2"

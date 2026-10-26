@@ -1,5 +1,6 @@
 class Listing < ApplicationRecord
   belongs_to :property
+  has_many_attached :photos
 
   enum :status, {
     draft: 0,

@@ -1,4 +1,59 @@
 <div class="container py-5">
+
+  
+  <% if @listing.property.host == current_user %>
+    <div class="d-flex gap-2 mb-4">
+
+      <%= link_to "Edit Listing",
+                  edit_listing_path(@listing),
+                  class: "btn btn-warning" %>
+
+      <% unless @listing.applications.exists? %>
+        <%= button_to "Delete Listing",
+                      listing_path(@listing),
+                      method: :delete,
+                      class: "btn btn-danger",
+                      form: {
+                        data: {
+                          turbo_confirm: "Are you sure you want to delete this listing?"
+                        }
+                      } %>
+      <% end %>
+
+    </div>
+  <% end %>
+
+  
+  <% if @listing.property.host == current_user && @listing.draft? %>
+    <div class="mb-4">
+      <%= button_to "Publish Listing",
+                    publish_listing_path(@listing),
+                    method: :patch,
+                    class: "btn btn-success",
+                    form: {
+                      data: {
+                        turbo_confirm: "Publish this listing?"
+                      }
+                    } %>
+    </div>
+  <% end %>
+
+  
+  <% if @listing.property.host == current_user && @listing.published? %>
+    <div class="mb-4">
+      <%= button_to "Withdraw Listing",
+                    withdraw_listing_path(@listing),
+                    method: :patch,
+                    class: "btn btn-outline-danger",
+                    form: {
+                      data: {
+                        turbo_confirm: "Withdraw this listing?"
+                      }
+                    } %>
+    </div>
+  <% end %>
+
+
   <%= link_to "← Back to listings",
               listings_path,
               class: "btn btn-outline-secondary mb-4" %>
@@ -10,6 +65,24 @@
       <p class="lead">
         <%= @listing.description %>
       </p>
+
+      
+      <% if @listing.photos.attached? %>
+        <section class="my-4">
+          <h2 class="h4 mb-3">Room photographs</h2>
+
+          <div class="row g-3">
+            <% @listing.photos.each do |photo| %>
+              <div class="col-md-6">
+                <%= image_tag photo,
+                      class: "img-fluid rounded shadow-sm",
+                      style: "width: 100%; height: 260px; object-fit: cover;" %>
+              </div>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
 
       <hr>
 
