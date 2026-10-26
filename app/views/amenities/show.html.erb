@@ -1,0 +1,42 @@
+
+<div class="container py-5">
+  <%= link_to "← Back to amenities",
+              amenities_path,
+              class: "btn btn-outline-secondary mb-4" %>
+
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <h1 class="mb-0"><%= @amenity.name %></h1>
+
+    <div class="d-flex gap-2">
+      <%= link_to "Edit Amenity",
+                  edit_amenity_path(@amenity),
+                  class: "btn btn-warning" %>
+
+      <%= button_to "Delete Amenity",
+                    amenity_path(@amenity),
+                    method: :delete,
+                    form: {
+                      data: {
+                        turbo_confirm: "Are you sure you want to delete this amenity?"
+                      }
+                    },
+                    class: "btn btn-danger" %>
+    </div>
+  </div>
+
+  <h2 class="mt-5">Properties with this amenity</h2>
+
+  <% if @amenity.properties.any? %>
+    <div class="list-group mt-3">
+      <% @amenity.properties.each do |property| %>
+        <%= link_to property.address,
+                    property_path(property),
+                    class: "list-group-item list-group-item-action" %>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted mt-3">
+      No properties use this amenity yet.
+    </p>
+  <% end %>
+</div>
