@@ -55,6 +55,36 @@
               <%= link_to "Applications", applications_path, class: "nav-link" %>
             </li>
           </ul>
+            <% if current_user %>
+              <%= form_with url: root_path,
+                            method: :get,
+                            data: { turbo: false },
+                            class: "d-flex flex-wrap align-items-center gap-2 ms-lg-3 my-2" do %>
+
+                <%= label_tag :acting_user_id,
+                              "Acting as",
+                              class: "text-light small text-nowrap" %>
+
+                <%= select_tag :user_id,
+                              options_from_collection_for_select(
+                                User.order(:name),
+                                :id,
+                                :name,
+                                current_user.id
+                              ),
+                              id: "acting_user_id",
+                              class: "form-select form-select-sm",
+                              style: "width: auto;" %>
+
+                <%= submit_tag "Switch",
+                              name: nil,
+                              class: "btn btn-outline-light btn-sm" %>
+              <% end %>
+          <% else %>
+            <span class="text-light small ms-lg-3">
+              No users available.
+            </span>
+          <% end %>
         </div>
       </div>
     </nav>
