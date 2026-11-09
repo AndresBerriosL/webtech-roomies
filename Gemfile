@@ -65,7 +65,7 @@ end
 gem "image_processing", "~> 2.0"
 gem "mini_magick", "~> 5.0"
 
-gem "json", "= 2.21.2"
+gem "json", "3.1.0"
 gem "fiddle"
 
 gem "pundit", "~> 2.5"
