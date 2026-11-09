@@ -5,10 +5,8 @@
 
   <h1>Application</h1>
 
-  <% if @application.listing.property.host == current_user &&
-      @application.shortlisted? &&
-      @application.listing.published? &&
-      !@application.visits.where(status: [:proposed, :confirmed]).exists? %>
+  <% if policy(Visit.new(application: @application)).create? &&
+        !@application.visits.where(status: [:proposed, :confirmed]).exists? %>
 
     <div class="my-3">
       <%= link_to "Propose visit",

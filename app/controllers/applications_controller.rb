@@ -105,10 +105,9 @@ class ApplicationsController < ApplicationController
         listing.applications
           .where(status: [:pending, :shortlisted])
           .where.not(id: @application.id)
-          .update_all(
-            status: Application.statuses[:rejected],
-            updated_at: Time.current
-          )
+          .find_each do |other_application|
+            other_application.update!(status: :rejected)
+          end
 
         listing.update!(status: :reserved)
       end

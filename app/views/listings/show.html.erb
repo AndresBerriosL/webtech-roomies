@@ -13,14 +13,14 @@
 
 
   
-  <% if @listing.property.host == current_user %>
+  <% if policy(@listing).update? %>
     <div class="d-flex gap-2 mb-4">
 
       <%= link_to "Edit Listing",
                   edit_listing_path(@listing),
                   class: "btn btn-warning" %>
 
-      <% unless @listing.applications.exists? %>
+      <% if policy(@listing).update? %>
         <%= button_to "Delete Listing",
                       listing_path(@listing),
                       method: :delete,
@@ -36,7 +36,7 @@
   <% end %>
 
   
-  <% if @listing.property.host == current_user && @listing.draft? %>
+  <% if policy(@listing).publish? && @listing.draft? %>
     <div class="mb-4">
       <%= button_to "Publish Listing",
                     publish_listing_path(@listing),
@@ -51,7 +51,7 @@
   <% end %>
 
   
-  <% if @listing.property.host == current_user && @listing.published? %>
+  <% if policy(@listing).withdraw? && @listing.published? %>
     <div class="mb-4">
       <%= button_to "Withdraw Listing",
                     withdraw_listing_path(@listing),

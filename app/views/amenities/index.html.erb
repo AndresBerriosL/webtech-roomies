@@ -3,9 +3,11 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="mb-0">Amenities</h1>
 
-    <%= link_to "New Amenity",
-                new_amenity_path,
-                class: "btn btn-primary" %>
+    <% if policy(Amenity.new).create? %>
+      <%= link_to "New Amenity",
+                  new_amenity_path,
+                  class: "btn btn-primary" %>
+    <% end %>
   </div>
 
   <% if @amenities.any? %>

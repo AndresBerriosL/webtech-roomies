@@ -1,7 +1,8 @@
 
 require "test_helper"
+require "active_job/test_helper"
 
-class RoomiesAuthorizationTest < ActiveSupport::TestCase
+class RoomiesAuthorizationTest < ActiveJob::TestCase
   setup do
     @host = User.create!(
       name: "Test Host",
@@ -145,4 +146,30 @@ class RoomiesAuthorizationTest < ActiveSupport::TestCase
     assert_not ReviewPolicy.new(@host, review).create?
     assert_not ReviewPolicy.new(@moderator, review).create?
   end
+
+  test "new applications enqueue an email to the host" do
+    another_seeker = User.create!(
+        name: "Another Seeker",
+        email: "another-seeker@example.test",
+        password: "RoomiesTest2026!",
+        role: :member
+    )
+
+    assert_enqueued_jobs 1, only: ActionMailer::MailDeliveryJob do
+        Application.create!(
+        listing: @listing,
+        seeker: another_seeker,
+        message: "I would like to rent this room.",
+        move_in_date: Date.current + 25,
+        intended_stay: 4
+        )
+    end
+    end
+
+    test "application status changes enqueue an email" do
+    assert_enqueued_jobs 1, only: ActionMailer::MailDeliveryJob do
+        @application.update!(status: :rejected)
+    end
+    end
+
 end

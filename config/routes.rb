@@ -40,8 +40,6 @@ Rails.application.routes.draw do
     resources :listings, only: %i[new create]
   end
 
-  resources :neighborhoods
-  resources :amenities
   resources :applications, only: %i[index show new create] do
     member do
       patch :withdraw
@@ -51,15 +49,16 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :applications, only: [] do
+    resources :visits, only: %i[new create]
+  end
+
   
   resources :visits, only: [] do
     resources :reviews, only: %i[new create]
   end
 
-  resources :reviews, only: %i[destroy]
-
-
-resources :visits, only: %i[show edit update] do
+  resources :visits, only: %i[show edit update] do
   member do
     patch :confirm
     patch :cancel
@@ -67,9 +66,6 @@ resources :visits, only: %i[show edit update] do
   end
 end
 
-  resources :visits, only: [] do
-    resources :reviews, only: %i[new create]
-  end
+get "up" => "rails/health#show", as: :rails_health_check
 
-  get "up" => "rails/health#show", as: :rails_health_check
 end

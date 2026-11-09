@@ -65,38 +65,6 @@ moderator = User.create!(
 )
 
 
-puts "Creating users..."
-
-andres = User.create!(
-  name: "Andrés Berríos",
-  email: "andres@example.com",
-  role: :member
-)
-
-sofia = User.create!(
-  name: "Sofía Martínez",
-  email: "sofia@example.com",
-  role: :member
-)
-
-matias = User.create!(
-  name: "Matías González",
-  email: "matias@example.com",
-  role: :member
-)
-
-camila = User.create!(
-  name: "Camila Rojas",
-  email: "camila@example.com",
-  role: :member
-)
-
-moderator = User.create!(
-  name: "Roomies Moderator",
-  email: "moderator@roomies.cl",
-  role: :moderator
-)
-
 puts "Creating neighborhoods..."
 
 providencia = Neighborhood.create!(name: "Providencia")

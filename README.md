@@ -218,7 +218,9 @@ ruby bin/rails test
 Remove-Item Env:SKIP_CSS_BUILD
 ```
 
-The authorization suite includes 9 tests and 28 assertions covering roles, properties, applications, visits, reviews, reports and policy scopes.
+The authorization and notification test suite includes 11 tests and
+32 assertions covering roles, properties, applications, visits,
+reviews, reports, policy scopes and email job enqueueing.
 
 ## Project structure
 
