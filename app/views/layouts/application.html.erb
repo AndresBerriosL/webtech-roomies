@@ -39,6 +39,17 @@
 
         <div class="collapse navbar-collapse" id="roomiesNavbar">
           <ul class="navbar-nav ms-auto">
+
+
+              <% if current_user&.moderator? %>
+                <li class="nav-item">
+                  <%= link_to "Reports",
+                        reports_path,
+                        class: "nav-link" %>
+                </li>
+              <% end %>
+
+
             <li class="nav-item">
               <%= link_to "Rooms", listings_path, class: "nav-link" %>
             </li>
@@ -62,36 +73,31 @@
             </li>
 
           </ul>
-            <% if current_user %>
-              <%= form_with url: root_path,
-                            method: :get,
-                            data: { turbo: false },
-                            class: "d-flex flex-wrap align-items-center gap-2 ms-lg-3 my-2" do %>
-
-                <%= label_tag :acting_user_id,
-                              "Acting as",
-                              class: "text-light small text-nowrap" %>
-
-                <%= select_tag :user_id,
-                              options_from_collection_for_select(
-                                User.order(:name),
-                                :id,
-                                :name,
-                                current_user.id
-                              ),
-                              id: "acting_user_id",
-                              class: "form-select form-select-sm",
-                              style: "width: auto;" %>
-
-                <%= submit_tag "Switch",
-                              name: nil,
-                              class: "btn btn-outline-light btn-sm" %>
-              <% end %>
-          <% else %>
-            <span class="text-light small ms-lg-3">
-              No users available.
+            
+          <% if current_user %>
+            <span class="navbar-text text-white ms-lg-3">
+              <%= current_user.name %>
             </span>
+
+            <%= link_to "My Profile",
+              edit_profile_path,
+              class: "nav-link text-light m2-3 m3-2" %>
+
+            <%= button_to "Sign out",
+                  session_path,
+                  method: :delete,
+                  class: "btn btn-outline-light btn-sm ms-lg-3",
+                  form: { class: "d-inline" } %>
+          <% else %>
+            <%= link_to "Sign in",
+                  new_session_path,
+                  class: "btn btn-outline-light btn-sm ms-lg-3" %>
+
+            <%= link_to "Sign up",
+                  new_registration_path,
+                  class: "btn btn-primary btn-sm ms-lg-2" %>
           <% end %>
+
         </div>
       </div>
     </nav>

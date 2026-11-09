@@ -1,5 +1,17 @@
 <div class="container py-5">
 
+
+  <% report = Report.new(listing: @listing) %>
+
+  <% if policy(report).create? %>
+    <div class="d-flex justify-content-end mb-3">
+      <%= link_to "Report Listing",
+            new_listing_report_path(@listing),
+            class: "btn btn-outline-danger" %>
+    </div>
+  <% end %>
+
+
   
   <% if @listing.property.host == current_user %>
     <div class="d-flex gap-2 mb-4">

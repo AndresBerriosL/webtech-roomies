@@ -1,4 +1,32 @@
 Rails.application.routes.draw do
+  resource :profile, only: %i[edit update]
+
+
+
+  namespace :api do
+    namespace :v1 do
+      resources :listings, only: %i[index show]
+    end
+  end
+
+
+
+  resources :listings, only: [] do
+    resources :reports, only: %i[new create]
+  end
+
+  resources :reports, only: %i[index] do
+    member do
+      patch :resolve
+    end
+  end
+
+  
+  resources :passwords, param: :token, only: %i[new create edit update]
+
+  resource :session, only: %i[new create destroy]
+
+  resource :registration, only: %i[new create]
   root "home#index"
 
   
@@ -23,9 +51,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :applications, only: [] do
-  resources :visits, only: %i[new create]
-end
+  
+  resources :visits, only: [] do
+    resources :reviews, only: %i[new create]
+  end
+
+  resources :reviews, only: %i[destroy]
+
 
 resources :visits, only: %i[show edit update] do
   member do

@@ -9,6 +9,10 @@
 #   end
 puts "Cleaning database..."
 
+
+puts "Cleaning database..."
+
+Session.delete_all
 Review.delete_all
 Visit.delete_all
 Report.delete_all
@@ -20,6 +24,46 @@ Property.delete_all
 Amenity.delete_all
 Neighborhood.delete_all
 User.delete_all
+
+puts "Creating users..."
+
+demo_password = ENV.fetch("ROOMIES_DEMO_PASSWORD", "RoomiesDemo2026!")
+
+andres = User.create!(
+  name: "Andrés Berríos",
+  email: "andres@example.com",
+  password: demo_password,
+  role: :member
+)
+
+sofia = User.create!(
+  name: "Sofía Martínez",
+  email: "sofia@example.com",
+  password: demo_password,
+  role: :member
+)
+
+matias = User.create!(
+  name: "Matías González",
+  email: "matias@example.com",
+  password: demo_password,
+  role: :member
+)
+
+camila = User.create!(
+  name: "Camila Rojas",
+  email: "camila@example.com",
+  password: demo_password,
+  role: :member
+)
+
+moderator = User.create!(
+  name: "Roomies Moderator",
+  email: "moderator@roomies.cl",
+  password: demo_password,
+  role: :moderator
+)
+
 
 puts "Creating users..."
 

@@ -6,6 +6,17 @@ Rails.application.configure do
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
+
+  # Process notification jobs asynchronously in development.
+  config.active_job.queue_adapter = :async
+
+  # Save development emails locally instead of sending real emails.
+  config.action_mailer.delivery_method = :file
+  config.action_mailer.file_settings = {
+    location: Rails.root.join("tmp", "mails").to_s
+  }
+
+
   # Do not eager load code on boot.
   config.eager_load = false
 

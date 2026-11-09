@@ -1,0 +1,83 @@
+
+<div class="container py-5" style="max-width: 700px;">
+  <h1 class="mb-2">My Profile</h1>
+
+  <p class="text-muted mb-4">
+    Update your personal information.
+  </p>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+
+      <%= form_with model: @user,
+                    url: profile_path,
+                    method: :patch do |f| %>
+
+        <% if @user.errors.any? %>
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              <% @user.errors.full_messages.each do |error| %>
+                <li><%= error %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="mb-3">
+          <%= f.label :name, "Full name",
+                      class: "form-label" %>
+
+          <%= f.text_field :name,
+                class: "form-control",
+                required: true %>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">
+            Email address
+          </label>
+
+          <input type="email"
+                 class="form-control"
+                 value="<%= @user.email %>"
+                 disabled>
+
+          <div class="form-text">
+            Your email cannot be changed here.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :contact,
+                "Contact information",
+                class: "form-label" %>
+
+          <%= f.text_field :contact,
+                class: "form-control",
+                placeholder: "Phone number or contact method" %>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :bio, "Biography",
+                      class: "form-label" %>
+
+          <%= f.text_area :bio,
+                class: "form-control",
+                rows: 5,
+                placeholder: "Tell us a little about yourself..." %>
+        </div>
+
+        <div class="d-flex gap-2">
+          <%= f.submit "Save Changes",
+                class: "btn btn-primary" %>
+
+          <%= link_to "Cancel",
+                root_path,
+                class: "btn btn-outline-secondary" %>
+        </div>
+
+      <% end %>
+
+    </div>
+  </div>
+</div>

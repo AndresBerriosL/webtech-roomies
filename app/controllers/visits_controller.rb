@@ -1,20 +1,24 @@
 
 class VisitsController < ApplicationController
   before_action :set_application, only: %i[new create]
-  before_action :set_visit, only: %i[show edit update confirm cancel complete]
-  def new
-    return unless host_can_propose?
+  before_action :set_visit,
+                only: %i[show edit update confirm cancel complete]
 
+  def new
     @visit = @application.visits.build
+    authorize @visit
+
+    return unless ensure_no_active_visit
   end
 
   def create
-    return unless host_can_propose?
-
     @visit = @application.visits.build(visit_params)
     @visit.status = :proposed
+    authorize @visit
 
-    if @visit.scheduled_at.present? &&
+    return unless ensure_no_active_visit
+
+    if @visit.scheduled_at.blank? ||
        @visit.scheduled_at <= Time.current
       @visit.errors.add(:scheduled_at, "must be in the future")
     end
@@ -23,137 +27,117 @@ class VisitsController < ApplicationController
       redirect_to @application,
                   notice: "Visit proposed successfully."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
   def show
-    return unless participant?
-
+    authorize @visit
   end
 
-  
-def edit
-  return unless participant?
-  return unless host?
+  def edit
+    authorize @visit
 
-  unless @visit.proposed? || @visit.confirmed?
-    redirect_to @visit,
-                alert: "This visit cannot be rescheduled."
-  end
-end
-
-def update
-  return unless participant?
-  return unless host?
-
-  unless @visit.proposed? || @visit.confirmed?
-    redirect_to @visit,
-                alert: "This visit cannot be rescheduled."
-    return
+    unless @visit.proposed? || @visit.confirmed?
+      redirect_to @visit,
+                  alert: "This visit cannot be rescheduled."
+    end
   end
 
-  new_date = visit_params[:scheduled_at]
+  def update
+    authorize @visit
 
-  if new_date.blank? || Time.zone.parse(new_date) <= Time.current
-    @visit.errors.add(:scheduled_at, "must be in the future")
-    render :edit, status: :unprocessable_entity
-    return
+    unless @visit.proposed? || @visit.confirmed?
+      redirect_to @visit,
+                  alert: "This visit cannot be rescheduled."
+      return
+    end
+
+    new_date = visit_params[:scheduled_at]
+
+    if new_date.blank? ||
+       Time.zone.parse(new_date) <= Time.current
+      @visit.errors.add(:scheduled_at, "must be in the future")
+      render :edit, status: :unprocessable_content
+      return
+    end
+
+    if @visit.update(
+      scheduled_at: new_date,
+      status: :proposed
+    )
+      redirect_to @visit,
+                  notice: "Visit rescheduled successfully."
+    else
+      render :edit, status: :unprocessable_content
+    end
   end
-
-  if @visit.update(
-    scheduled_at: new_date,
-    status: :proposed
-  )
-    redirect_to @visit,
-                notice: "Visit rescheduled successfully. Awaiting confirmation."
-  else
-    render :edit, status: :unprocessable_entity
-  end
-end
-
 
   def confirm
-    return unless participant?
-    return unless seeker?
+    authorize @visit
 
     if @visit.proposed? && @visit.update(status: :confirmed)
-      redirect_to @visit, notice: "Visit confirmed successfully."
+      redirect_to @visit,
+                  notice: "Visit confirmed successfully."
     else
-      redirect_to @visit, alert: "This visit cannot be confirmed."
+      redirect_to @visit,
+                  alert: "This visit cannot be confirmed."
     end
   end
 
   def cancel
-    return unless participant?
+    authorize @visit
 
     if (@visit.proposed? || @visit.confirmed?) &&
        @visit.update(status: :cancelled)
-      redirect_to @visit, notice: "Visit cancelled successfully."
+      redirect_to @visit,
+                  notice: "Visit cancelled successfully."
     else
-      redirect_to @visit, alert: "This visit cannot be cancelled."
+      redirect_to @visit,
+                  alert: "This visit cannot be cancelled."
     end
   end
 
   def complete
-    return unless participant?
-    return unless host?
+    authorize @visit
 
     if @visit.confirmed? &&
        @visit.scheduled_at <= Time.current &&
        @visit.update(status: :completed)
-      redirect_to @visit, notice: "Visit completed successfully."
+      redirect_to @visit,
+                  notice: "Visit completed successfully."
     else
-      redirect_to @visit, alert: "This visit cannot be completed."
+      redirect_to @visit,
+                  alert: "This visit cannot be completed."
     end
   end
 
   private
 
   def set_application
-    @application = Application.find(params[:application_id])
+    @application = policy_scope(Application)
+                   .find(params[:application_id])
   end
 
   def set_visit
-    @visit = Visit.includes(application: { listing: :property })
-                  .find(params[:id])
+    @visit = policy_scope(Visit)
+             .includes(application: { listing: :property })
+             .find(params[:id])
+
     @application = @visit.application
   end
 
-  def host?
-    @application.listing.property.host_id == current_user.id
-  end
-
-  def seeker?
-    @application.seeker_id == current_user.id
-  end
-
-  def participant?
-    return true if host? || seeker?
-
-    redirect_to applications_path,
-                alert: "You are not authorized to view this visit."
-    false
-  end
-
-  def host_can_propose?
-    unless host? &&
-            @application.shortlisted? &&
-            @application.listing.published?
-
-        redirect_to applications_path,
-                    alert: "Only the host can propose a visit for a shortlisted application."
-        return false
-    end
-
-    if @application.visits.where(status: [:proposed, :confirmed]).exists?
-        redirect_to @application,
-                    alert: "There is already an active visit for this application."
-        return false
+  def ensure_no_active_visit
+    if @application.visits
+                   .where(status: %i[proposed confirmed])
+                   .exists?
+      redirect_to @application,
+                  alert: "There is already an active visit."
+      return false
     end
 
     true
-    end             
+  end
 
   def visit_params
     params.require(:visit).permit(:scheduled_at)

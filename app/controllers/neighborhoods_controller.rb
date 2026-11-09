@@ -1,46 +1,66 @@
 
 class NeighborhoodsController < ApplicationController
-  before_action :set_neighborhood, only: %i[show edit update destroy]
+  allow_unauthenticated_access only: %i[index show]
+
+  before_action :set_neighborhood,
+                only: %i[show edit update destroy]
 
   def index
-    @neighborhoods = Neighborhood.order(:name)
+    authorize Neighborhood, :index?
+    @neighborhoods = policy_scope(Neighborhood).order(:name)
   end
 
   def show
-    @properties = @neighborhood.properties.includes(:listings)
+    authorize @neighborhood
+
+    @properties = policy_scope(Property)
+                  .where(neighborhood_id: @neighborhood.id)
+                  .includes(:listings)
   end
 
   def new
     @neighborhood = Neighborhood.new
+    authorize @neighborhood
   end
 
   def create
     @neighborhood = Neighborhood.new(neighborhood_params)
+    authorize @neighborhood
 
     if @neighborhood.save
-      redirect_to @neighborhood, notice: "Neighborhood created successfully."
+      redirect_to @neighborhood,
+                  notice: "Neighborhood created successfully."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
   def edit
+    authorize @neighborhood
   end
 
   def update
+    authorize @neighborhood
+
     if @neighborhood.update(neighborhood_params)
-      redirect_to @neighborhood, notice: "Neighborhood updated successfully."
+      redirect_to @neighborhood,
+                  notice: "Neighborhood updated successfully."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
   def destroy
+    authorize @neighborhood
+
     if @neighborhood.destroy
-      redirect_to neighborhoods_path, notice: "Neighborhood deleted successfully."
+      redirect_to neighborhoods_path,
+                  status: :see_other,
+                  notice: "Neighborhood deleted successfully."
     else
       redirect_to @neighborhood,
-                  alert: "Neighborhood could not be deleted."
+                  status: :see_other,
+                  alert: @neighborhood.errors.full_messages.to_sentence
     end
   end
 

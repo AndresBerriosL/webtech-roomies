@@ -1,20 +1,94 @@
-<div class="container py-5">
+
+<div class="container py-5" data-controller="room-search">
+
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Available rooms</h1>
-    <span class="text-muted">
+    <div>
+      <h1 class="mb-1">Find your room</h1>
+      <p class="text-muted mb-0">
+        Explore available rooms and filter your results.
+      </p>
+    </div>
+
+    <span class="badge bg-primary fs-6"
+          data-room-search-target="count">
       <%= pluralize(@listings.size, "room") %>
     </span>
   </div>
 
-  <% if @listings.any? %>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-      <%= render partial: "listing_card",
-                 collection: @listings,
-                 as: :listing %>
+  <form action="<%= listings_path %>"
+        method="get"
+        data-room-search-target="form"
+        data-action="input->room-search#schedule change->room-search#schedule submit->room-search#submit"
+        class="card shadow-sm mb-4">
+
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+
+        <div class="col-md-4">
+          <label for="neighborhood_id" class="form-label">
+            Neighborhood
+          </label>
+
+          <%= select_tag :neighborhood_id,
+                options_from_collection_for_select(
+                  Neighborhood.order(:name),
+                  :id,
+                  :name
+                ),
+                include_blank: "All neighborhoods",
+                class: "form-select" %>
+        </div>
+
+        <div class="col-md-3">
+          <label for="max_rent" class="form-label">
+            Maximum rent (CLP)
+          </label>
+
+          <%= number_field_tag :max_rent,
+                nil,
+                min: 0,
+                step: 1000,
+                placeholder: "e.g. 400000",
+                class: "form-control" %>
+        </div>
+
+        <div class="col-md-3">
+          <label for="furnished" class="form-label">
+            Furnished
+          </label>
+
+          <%= select_tag :furnished,
+                options_for_select([
+                  ["Any", ""],
+                  ["Yes", "true"],
+                  ["No", "false"]
+                ]),
+                class: "form-select" %>
+        </div>
+
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-primary w-100">
+            Search
+          </button>
+        </div>
+
+      </div>
     </div>
-  <% else %>
-    <div class="alert alert-info">
-      There are no published listings available.
-    </div>
-  <% end %>
+  </form>
+
+  <p class="text-muted"
+     role="status"
+     aria-live="polite"
+     data-room-search-target="status">
+  </p>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"
+       data-room-search-target="results">
+
+    <%= render partial: "listing_card",
+               collection: @listings,
+               as: :listing %>
+
+  </div>
+
 </div>

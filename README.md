@@ -1,281 +1,240 @@
-# Roomies
 
-Roomies is a Ruby on Rails application for finding rooms and compatible roommates.
+# Roomies — Web Technologies
 
-The platform allows visitors to browse available rooms and neighborhoods. Members can act as hosts by publishing rooms or as seekers by applying to listings, scheduling visits, saving listings, and reviewing properties.
+Roomies is a Ruby on Rails 8 web application for finding rooms and managing shared housing.
 
-This repository contains the implementation for **Assignment 2 — Rails Application, Models, and Read-Only Views** of Web Technologies.
+This repository includes the implementation of **Assignment 4: Authentication, Authorization, JSON API, Dynamic Search and Notifications**.
 
 ## Technologies
 
 - Ruby 4.0.4
-- Ruby on Rails 8.0.5.1
+- Ruby on Rails 8
 - PostgreSQL
-- Bootstrap
-- Sass
-- Node.js
-- Yarn
+- Bootstrap 5 and Sass
+- JavaScript, Stimulus and Fetch API
+- Pundit
+- Active Job and Action Mailer
 
 ## Features
 
-The current version includes:
+### Authentication
 
-- Rails application configured with PostgreSQL
-- Bootstrap integrated through `cssbundling-rails`
-- Responsive layout with shared navbar and footer
-- Landing page available at the root route
-- Complete domain model implemented with Active Record
-- Database foreign keys, unique indexes, and constraints
-- Model validations
-- Rails enums for lifecycle states
-- Reusable listing card partial
-- Realistic seed data
-- Read-only `index` and `show` pages for:
-  - Listings
-  - Properties
-  - Neighborhoods
-  - Applications
+- User registration and sign-in
+- Secure password authentication
+- Sign-out
+- Password reset through email
+- Editable profile: name, contact information and biography
 
-### Listing lifecycle
+### Authorization
 
-Listings can have the following states:
+Pundit controls access according to the user's role.
 
-- `draft`
-- `published`
-- `reserved`
-- `rented`
-- `withdrawn`
+**Visitor**
+- Browse published listings
+- Search available rooms
+- View public neighborhoods and amenities
 
-### Application lifecycle
+**Member**
+- Create and manage their own properties and listings
+- Apply to listings owned by other users
+- Manage applications for their own listings
+- Propose and manage visits with participants
+- Review properties after completed visits
+- Report listings
 
-Applications can have the following states:
+**Moderator**
+- Browse private records according to moderation policies
+- Manage neighborhoods and amenities
+- View and resolve reports
+- Edit or delete properties and listings
+- Cannot accept applications on behalf of hosts
 
-- `pending`
-- `shortlisted`
-- `accepted`
-- `rejected`
-- `withdrawn`
+Sensitive resources use Pundit policies and policy scopes.
 
-### Visit lifecycle
+### Listings and applications
 
-Visits can have the following states:
+- Property management
+- Draft and published listings
+- Applications with pending, shortlisted, accepted, rejected and withdrawn states
+- Visit scheduling and status management
+- Property reviews
+- Listing reports
 
-- `proposed`
-- `confirmed`
-- `cancelled`
-- `completed`
+### Dynamic search
 
-## Setup
+The `/listings` page uses JavaScript Fetch API to search published listings without reloading the page.
 
-### 1. Clone the repository
+Available filters:
+- Maximum monthly rent
+- Neighborhood
+- Furnished or unfurnished
+
+### Versioned JSON API
+
+Base path: `/api/v1`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/v1/listings` | List published rooms |
+| GET | `/api/v1/listings/:id` | Retrieve one published room |
+
+Supported query parameters:
+
+| Parameter | Example |
+|---|---|
+| `max_rent` | `400000` |
+| `neighborhood_id` | `1` |
+| `furnished` | `true` or `false` |
+
+Example:
+
+`/api/v1/listings?max_rent=400000&furnished=true`
+
+Successful responses use a `data` field. Listing collections also include `meta.count`.
+
+Invalid filters return HTTP 400. Missing or non-public listings return HTTP 404.
+
+The API excludes user email addresses, passwords and private profile information.
+
+### Email notifications
+
+- Hosts receive notifications when applications are created.
+- Seekers receive notifications when their application status changes.
+- Password recovery emails include reset links.
+- Active Job handles background email delivery.
+
+In development, emails are saved to `tmp/mails` instead of being sent to real addresses.
+
+## Installation
+
+### Requirements
+
+Install Ruby, Bundler, PostgreSQL, Node.js and Yarn.
+
+Clone the project:
 
 ```bash
 git clone https://github.com/AndresBerriosL/webtech-roomies.git
 cd webtech-roomies
 ```
 
-### 2. Install Ruby dependencies
+Install Ruby dependencies:
 
 ```bash
 bundle install
 ```
 
-### 3. Install JavaScript dependencies
+Install JavaScript dependencies and compile CSS.
 
-```bash
-yarn install
+On Windows PowerShell:
+
+```powershell
+yarn.cmd install
+yarn.cmd build:css
 ```
 
-## PostgreSQL configuration
+### Database configuration
 
-Roomies uses PostgreSQL in development and test.
+The project reads these environment variables:
 
-The database connection can be configured using environment variables:
+| Variable | Default |
+|---|---|
+| `DB_HOST` | `127.0.0.1` |
+| `DB_PORT` | `5432` |
+| `DB_USER` | `postgres` |
+| `ROOMIES_DB_PASSWORD` | No default |
 
-| Variable | Description | Default |
-|---|---|---|
-| `DB_HOST` | PostgreSQL host | `127.0.0.1` |
-| `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_USER` | PostgreSQL user | `postgres` |
-| `ROOMIES_DB_PASSWORD` | PostgreSQL password | Required |
+Example for PowerShell:
 
-Example in Git Bash:
-
-```bash
-export ROOMIES_DB_PASSWORD="your_postgresql_password"
+```powershell
+$env:DB_PORT = "5433"
+$env:ROOMIES_DB_PASSWORD = Read-Host "PostgreSQL password"
 ```
 
-If PostgreSQL is running on a different port:
+Create and migrate the database:
 
-```bash
-export DB_PORT=5433
-```
-
-## Database setup
-
-Create the databases:
-
-```bash
+```powershell
 ruby bin/rails db:create
-```
-
-Run the migrations:
-
-```bash
 ruby bin/rails db:migrate
 ```
 
-Populate the database:
+For a fresh demonstration database only:
 
-```bash
+```powershell
 ruby bin/rails db:seed
 ```
 
-The seed file creates realistic sample data including:
+**Warning:** the current seed script deletes existing sample records before recreating them. Do not run it against a database containing data you want to keep.
 
-- Users
-- Neighborhoods
-- Amenities
-- Properties
-- Listings
-- Applications in different states
-- Competing applications for the same listing
-- Visits in different states
-- A completed visit with a review
-- Saved listings
-- Reports
+Start the application:
 
-The application can therefore be browsed immediately after running the seeds.
-
-## Running the application
-
-Start the Rails application with:
-
-```bash
-bin/dev
+```powershell
+ruby bin/rails server
 ```
 
-On Windows, use **Git Bash**:
+Open `http://localhost:3000`.
 
-```bash
-./bin/dev
-```
+## Demonstration accounts
 
-Then open:
+The seed script creates sample accounts using this password:
 
-```text
-http://localhost:3000
-```
+`RoomiesDemo2026!`
 
-If PostgreSQL uses a non-default port, environment variables can also be supplied directly:
-
-```bash
-DB_PORT=5433 ROOMIES_DB_PASSWORD="your_postgresql_password" ./bin/dev
-```
-
-## Main routes
-
-| Route | Description |
+| Role | Email |
 |---|---|
-| `/` | Roomies landing page |
-| `/listings` | Published room listings |
-| `/listings/:id` | Listing details |
+| Member | `andres@example.com` |
+| Member | `sofia@example.com` |
+| Member | `matias@example.com` |
+| Member | `camila@example.com` |
+| Moderator | `moderator@roomies.cl` |
+
+These are development-only credentials. Passwords changed using the reset feature will differ from the seed password.
+
+## Important pages
+
+| Path | Purpose |
+|---|---|
+| `/` | Public home page |
+| `/listings` | Dynamic room search |
 | `/properties` | Properties |
-| `/properties/:id` | Property details |
-| `/neighborhoods` | Neighborhoods |
-| `/neighborhoods/:id` | Neighborhood details |
 | `/applications` | Applications |
-| `/applications/:id` | Application details |
+| `/neighborhoods` | Neighborhoods |
+| `/amenities` | Amenities |
+| `/reports` | Moderator report management |
+| `/registration/new` | Registration |
+| `/session/new` | Sign-in |
+| `/passwords/new` | Password recovery |
+| `/profile/edit` | Edit profile |
 
-All pages in Assignment 2 are read-only. The application does not provide UI actions for creating, editing, or deleting records yet.
+## Automated tests
 
-## Domain model
+Run tests on the separate PostgreSQL test database.
 
-The updated domain model is located at:
+In Windows PowerShell, CSS compilation can be skipped when running Ruby tests:
 
-```text
-docs/domain-model.png
+```powershell
+$env:SKIP_CSS_BUILD = "1"
+ruby bin/rails test
+Remove-Item Env:SKIP_CSS_BUILD
 ```
 
-The main entities are:
-
-- User
-- Neighborhood
-- Amenity
-- Property
-- PropertyAmenity
-- Listing
-- Application
-- Visit
-- Review
-- SavedListing
-- Report
-
-### Changes from Assignment 1
-
-A few implementation details were adjusted when translating the conceptual model into Rails:
-
-- `properties_amenities` was implemented as the `PropertyAmenity` model using the Rails table name `property_amenities`.
-- Join models use Rails-generated primary keys and timestamps.
-- Lifecycle states are implemented using Rails enums backed by integer columns.
-- `host_id`, `seeker_id`, and `reporter_id` reference the `users` table.
-- Composite unique indexes are used to enforce domain rules such as:
-  - A user cannot save the same listing twice.
-  - A seeker cannot apply to the same listing twice.
-  - An amenity cannot be attached to the same property twice.
-- A review belongs to a visit, with only one review allowed per visit.
-
-## Main model rules
-
-Some of the implemented validations include:
-
-- Required attributes cannot be blank.
-- Emails and catalog names must be unique where appropriate.
-- Rent and deposit values must be valid numerical values.
-- Minimum and intended stays must be positive integers.
-- Review ratings must be between 1 and 5.
-- Listing availability dates cannot be in the past.
-- Visits must be scheduled after their application was created.
-- A seeker cannot apply to their own listing.
-- Applications can only initially be made to published listings.
-- Reviews require a completed visit.
-
-## Scopes
-
-The application includes scopes for common queries such as:
-
-- Published listings
-- Listings available from a given date
-- Listings under a maximum rent
-- Applications pending an answer
+The authorization suite includes 9 tests and 28 assertions covering roles, properties, applications, visits, reviews, reports and policy scopes.
 
 ## Project structure
 
-Important files include:
+- `app/models` — Active Record models
+- `app/policies` — Pundit authorization policies
+- `app/controllers` — Web controllers
+- `app/controllers/api/v1` — JSON API
+- `app/javascript/controllers` — Stimulus controllers
+- `app/mailers` — Email notifications
+- `app/views` — HTML and ERB templates
+- `db/migrate` — Database migrations
+- `db/seeds.rb` — Demonstration data
+- `test/policies` — Authorization tests
 
-```text
-app/models/                 Domain models and validations
-app/controllers/            Read-only controllers
-app/views/                  ERB views
-db/migrate/                 Database migrations
-db/seeds.rb                 Seed data
-docs/domain-model.png       Updated domain model
-config/routes.rb            Application routes
-README.md                   Setup and project documentation
-```
+## Notes
 
-## Assignment scope
-
-Assignment 2 focuses on:
-
-- Rails application setup
-- PostgreSQL
-- Models and migrations
-- Active Record relationships
-- Validations
-- Enums and scopes
-- Seed data
-- Read-only controllers and views
-- Bootstrap layout and reusable partials
-
-Create, edit, update, and delete functionality through the interface is intentionally left for later assignments.
+- This project is intended for educational use.
+- The development mail adapter writes emails to local files.
+- Production deployments require a real email provider and a persistent background job queue.

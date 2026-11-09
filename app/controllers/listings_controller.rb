@@ -1,21 +1,22 @@
 
 class ListingsController < ApplicationController
-  before_action :set_listing, only: %i[show edit update destroy publish withdraw]
+  allow_unauthenticated_access only: %i[index show]
+
+  before_action :set_listing,
+                only: %i[show edit update destroy publish withdraw]
   before_action :set_property, only: %i[new create]
-  before_action :require_owner, only: %i[edit update destroy publish withdraw]
 
   def index
-    @listings = Listing.published
-                       .includes(property: :neighborhood)
-                       .order(created_at: :desc)
+    authorize Listing, :index?
+
+    @listings = policy_scope(Listing)
+                .published
+                .includes(property: :neighborhood)
+                .order(created_at: :desc)
   end
 
   def show
-    unless @listing.published? || @listing.property.host == current_user
-      redirect_to listings_path,
-                  alert: "This listing is not available."
-      return
-    end
+    authorize @listing
 
     @reviews = @listing.property.reviews.includes(
       visit: { application: :seeker }
@@ -23,46 +24,51 @@ class ListingsController < ApplicationController
   end
 
   def new
-    return unless check_property_owner
-
     @listing = @property.listings.build
+    authorize @listing
   end
 
   def create
-    return unless check_property_owner
-
     @listing = @property.listings.build(listing_params)
     @listing.status = :draft
+    authorize @listing
 
     if @listing.save
       redirect_to @listing,
                   notice: "Listing created as draft."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
   def edit
+    authorize @listing
   end
 
   def update
+    authorize @listing
+
     if @listing.update(listing_params)
       redirect_to @listing,
                   notice: "Listing updated successfully."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
   def destroy
+    authorize @listing
+
     if @listing.applications.exists?
       redirect_to @listing,
                   alert: "Cannot delete a listing with applications."
       return
     end
 
+    property = @listing.property
+
     if @listing.destroy
-      redirect_to property_path(@listing.property),
+      redirect_to property_path(property),
                   notice: "Listing deleted successfully."
     else
       redirect_to @listing,
@@ -70,8 +76,9 @@ class ListingsController < ApplicationController
     end
   end
 
-  
   def publish
+    authorize @listing
+
     unless @listing.draft?
       redirect_to @listing,
                   alert: "Only draft listings can be published."
@@ -87,8 +94,9 @@ class ListingsController < ApplicationController
     end
   end
 
-
   def withdraw
+    authorize @listing
+
     unless @listing.published?
       redirect_to @listing,
                   alert: "Only published listings can be withdrawn."
@@ -104,7 +112,6 @@ class ListingsController < ApplicationController
     end
   end
 
-
   private
 
   def set_listing
@@ -117,44 +124,24 @@ class ListingsController < ApplicationController
     @property = Property.find(params[:property_id])
   end
 
-  def check_property_owner
-    return true if @property.host == current_user
+  def listing_params
+    permitted = params.require(:listing).permit(
+      :monthly_rent,
+      :deposit,
+      :availability_date,
+      :minimum_stay,
+      :furnished,
+      :private_bathroom,
+      :description,
+      :house_rules,
+      photos: []
+    )
 
-    redirect_to properties_path,
-                alert: "You can only create listings for your own properties."
-    false
+    if permitted[:photos].present? &&
+       permitted[:photos].all?(&:blank?)
+      permitted.delete(:photos)
+    end
+
+    permitted
   end
-
-  def require_owner
-    return if @listing.property.host == current_user
-
-    redirect_to listings_path,
-                alert: "You can only modify your own listings."
-  end
-
-  
-  
-def listing_params
-  permitted = params.require(:listing).permit(
-    :monthly_rent,
-    :deposit,
-    :availability_date,
-    :minimum_stay,
-    :furnished,
-    :private_bathroom,
-    :description,
-    :house_rules,
-    photos: []
-  )
-
-  # Don't remove existing photos when editing without new uploads.
-  if permitted[:photos].present? &&
-     permitted[:photos].all?(&:blank?)
-    permitted.delete(:photos)
-  end
-
-  permitted
-end
-
-
 end

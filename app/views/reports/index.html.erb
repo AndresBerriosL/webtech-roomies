@@ -1,0 +1,74 @@
+
+<div class="container py-5">
+  <h1 class="mb-4">Listing Reports</h1>
+
+  <p class="text-muted">
+    Review and resolve reports submitted by Roomies users.
+  </p>
+
+  <% if @reports.any? %>
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Listing</th>
+            <th>Reported by</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @reports.each do |report| %>
+            <tr>
+              <td><%= report.id %></td>
+
+              <td>
+                <%= link_to report.listing.property.address,
+                            listing_path(report.listing) %>
+              </td>
+
+              <td><%= report.reporter.name %></td>
+
+              <td><%= report.reason %></td>
+
+              <td>
+                <% if report.pending? %>
+                  <span class="badge bg-warning text-dark">
+                    Pending
+                  </span>
+                <% else %>
+                  <span class="badge bg-success">
+                    Resolved
+                  </span>
+                <% end %>
+              </td>
+
+              <td>
+                <% if report.pending? %>
+                  <%= button_to "Resolve",
+                        resolve_report_path(report),
+                        method: :patch,
+                        class: "btn btn-success btn-sm",
+                        form: {
+                          data: {
+                            turbo_confirm: "Resolve this report?"
+                          }
+                        } %>
+                <% else %>
+                  <span class="text-muted">Completed</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-info">
+      There are no reports yet.
+    </div>
+  <% end %>
+</div>

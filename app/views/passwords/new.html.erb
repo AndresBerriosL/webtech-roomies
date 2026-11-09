@@ -1,0 +1,26 @@
+
+<div class="container py-5" style="max-width: 500px;">
+  <h1 class="mb-4">Forgot your password?</h1>
+
+  <p class="text-muted">
+    Enter your email address to receive password reset instructions.
+  </p>
+
+  <%= form_with url: passwords_path, method: :post do |form| %>
+    <div class="mb-3">
+      <%= form.label :email, "Email address",
+            class: "form-label" %>
+
+      <%= form.email_field :email,
+            class: "form-control",
+            required: true,
+            autofocus: true,
+            autocomplete: "email",
+            placeholder: "Enter your email",
+            value: params[:email] %>
+    </div>
+
+    <%= form.submit "Send reset instructions",
+          class: "btn btn-primary w-100" %>
+  <% end %>
+</div>

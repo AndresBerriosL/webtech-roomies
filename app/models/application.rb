@@ -1,6 +1,12 @@
+
 class Application < ApplicationRecord
   belongs_to :listing
-  belongs_to :seeker, class_name: "User", foreign_key: :seeker_id
+
+  belongs_to :seeker,
+             class_name: "User",
+             foreign_key: :seeker_id
+
+  has_many :visits, dependent: :destroy
 
   enum :status, {
     pending: 0,
@@ -14,7 +20,10 @@ class Application < ApplicationRecord
   validates :move_in_date, presence: true
 
   validates :intended_stay,
-            numericality: { only_integer: true, greater_than: 0 }
+            numericality: {
+              only_integer: true,
+              greater_than: 0
+            }
 
   validates :seeker_id,
             uniqueness: { scope: :listing_id }
@@ -22,17 +31,37 @@ class Application < ApplicationRecord
   validate :cannot_apply_to_own_listing
   validate :listing_must_be_published, on: :create
 
-  has_many :visits, dependent: :destroy
-
   scope :pending_answer, -> { where(status: :pending) }
 
+  after_create_commit :notify_host
+  after_update_commit :notify_seeker_of_status
+
   private
+
+  def notify_host
+    ApplicationNotificationMailer
+      .with(application: self)
+      .created
+      .deliver_later
+  end
+
+  def notify_seeker_of_status
+    return unless saved_change_to_status?
+
+    ApplicationNotificationMailer
+      .with(application: self)
+      .status_changed
+      .deliver_later
+  end
 
   def cannot_apply_to_own_listing
     return if listing.blank? || seeker.blank?
 
     if listing.property.host_id == seeker_id
-      errors.add(:seeker, "cannot apply to their own listing")
+      errors.add(
+        :seeker,
+        "cannot apply to their own listing"
+      )
     end
   end
 
@@ -40,7 +69,10 @@ class Application < ApplicationRecord
     return if listing.blank?
 
     unless listing.published?
-      errors.add(:listing, "must be published")
+      errors.add(
+        :listing,
+        "must be published"
+      )
     end
   end
 end
